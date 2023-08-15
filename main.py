@@ -2,12 +2,15 @@ import pygame, sys, random
 from player import Player
 from button import Button
 from crosshair import Crosshair
-from arcade.pymunk_physics_engine import PymunkPhysicsEngine
+from level import Level
 
+pygame.mixer.pre_init(44100,-16,2, 1024)
 pygame.init()
 pygame.mixer.init()
 
 volume = 0.5
+
+time_passed = 0
 
 pygame.mixer.music.set_volume(volume)
 
@@ -22,7 +25,7 @@ pygame.display.set_caption("Pixel Breaker")
 
 clock = pygame.time.Clock()
 
-crosshair = Crosshair('assets/sprites/crosshair.png')
+crosshair = Crosshair('assets/images/crosshair.png')
 crosshair_group = pygame.sprite.Group()
 crosshair_group.add(crosshair)
     
@@ -35,19 +38,34 @@ hover = pygame.mixer.Sound("assets/audio/PremiumBeat_0013_move_cursor_11.wav")
 
 menu_music = pygame.mixer.music.load("assets/audio/song55.mid")
 
+
+# images
+rect1 = pygame.image.load("assets/images/Rect1.png").convert()
+rect2 = pygame.image.load("assets/images/Rect2.png").convert()
+rect3 = pygame.image.load("assets/images/Rect3.png").convert()
+gear = pygame.image.load("assets/images/settings_gear.png").convert()
+question = pygame.image.load("assets/images/ques.png").convert()
+info_img = pygame.image.load("assets/images/info.png").convert()
+on = pygame.image.load("assets/images/audio_on.png").convert()
+off = pygame.image.load("assets/images/audio_off.png").convert()
+
 def get_font(size):
     return pygame.font.Font("assets/font.ttf", int(size))
 
-player = Player(1920 / 2, 1080 / 2)
+width, height = 1920, 1080
+
+level = Level()
+player = Player(width/2,height/2)
+
+map_surface = pygame.Surface((1920, 1080))
 
 new_width = 1.6
 new_height = 1.53125
 new_size = 2
 
-need_hover = True
-
 def start_menu():
-    global need_hover
+    pygame.mixer.music.stop()
+    level_music = pygame.mixer.music.load("assets/audio/song55.mid")
     pygame.mixer.music.play()
     while True:
         screen.fill((0,0,0))
@@ -56,15 +74,15 @@ def start_menu():
         start_text = get_font(100*new_size).render("Pixel Breaker", True, "purple").convert_alpha()
         start_rect = start_text.get_rect(center=(600*new_width, 100*new_height))
 
-        PLAY_BUTTON = Button(image=pygame.image.load("assets/sprites/Warning Rect.png").convert(), pos=(600*new_width, 300*new_height),
+        PLAY_BUTTON = Button(image=rect1, pos=(600*new_width, 300*new_height),
                              text_input="play", font=get_font(75*new_size), base_color="White", hovering_color="Green")
-        QUIT_BUTTON = Button(image=pygame.image.load("assets/sprites/Warning Rect.png").convert(), pos=(600*new_width, 500*new_height),
+        QUIT_BUTTON = Button(image=rect1, pos=(600*new_width, 500*new_height),
                              text_input="quit", font=get_font(75*new_size), base_color="White", hovering_color="Red")
-        SETTINGS_BUTTON = Button(image=pygame.image.load("assets/sprites/settings_gear.png").convert(), pos=(1140*new_width, 60*new_height),
+        SETTINGS_BUTTON = Button(image=gear, pos=(1140*new_width, 60*new_height),
                                  text_input="", font=get_font(30*new_size), base_color="White", hovering_color="Black")
-        HOWTOPLAY_BUTTON = Button(image=pygame.image.load("assets/sprites/ques.png").convert(), pos=(1135*new_width, 310*new_height),
+        HOWTOPLAY_BUTTON = Button(image=question, pos=(1135*new_width, 310*new_height),
                              text_input="", font=get_font(75*new_size), base_color="White", hovering_color="Red")
-        INFO_BUTTON = Button(image=pygame.image.load("assets/sprites/info.png").convert(), pos=(1140*new_width, 175*new_height),
+        INFO_BUTTON = Button(image=info_img, pos=(1140*new_width, 175*new_height),
                              text_input="", font=get_font(75*new_size), base_color="White", hovering_color="Red")
 
         screen.blit(start_text, start_rect)
@@ -121,7 +139,7 @@ def howtoplay():
         howtoplay2_text = get_font(10*new_size).render(about, True, "white").convert_alpha()
         howtoplay2_rect = howtoplay2_text.get_rect(center=(600*new_width, 300*new_height))
 
-        RETURN_BUTTON = Button(image=pygame.image.load("assets/sprites/Warning rect.png").convert(), pos=(600*new_width, 500*new_height),
+        RETURN_BUTTON = Button(image=rect1, pos=(600*new_width, 500*new_height),
                         text_input="return", font=get_font(50*new_size), base_color="white", hovering_color="Darkgray")
 
         screen.blit(howtoplay_text,howtoplay_rect)
@@ -155,12 +173,12 @@ def settings():
         SETTINGS_TEXT = get_font(100*new_size).render("SETTINGS", True, "gray").convert_alpha()
         SETTINGS_RECT = SETTINGS_TEXT.get_rect(center=(600*new_width, 100*new_height))
 
-        RETURN_BUTTON = Button(image=pygame.image.load("assets/sprites/Quit Rect.png").convert(), pos=(600*new_width, 400*new_height),
+        RETURN_BUTTON = Button(image=rect2, pos=(600*new_width, 400*new_height),
                             text_input="return", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
 
-        AUDIO_ON_BUTTON = Button(image=pygame.image.load("assets/sprites/audio_on.png").convert(), pos=(500*new_width, 250*new_height),
+        AUDIO_ON_BUTTON = Button(image=on, pos=(500*new_width, 250*new_height),
                             text_input="", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
-        AUDIO_OFF_BUTTON = Button(image=pygame.image.load("assets/sprites/audio_off.png").convert(), pos=(700*new_width, 250*new_height),
+        AUDIO_OFF_BUTTON = Button(image=off, pos=(700*new_width, 250*new_height),
                             text_input="", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
         
         screen.blit(SETTINGS_TEXT, SETTINGS_RECT)
@@ -218,9 +236,9 @@ def warning_quit():
         warning_text = get_font(75*new_size).render("Are you sure you want to quit?", True, (255, 255, 255)).convert_alpha()
         warning_rect = warning_text.get_rect(center=(600*new_width, 100*new_height))
 
-        YES_BUTTON = Button(image=pygame.image.load("assets/sprites/Warning Rect.png").convert(), pos=(425*new_width, 250*new_height),
+        YES_BUTTON = Button(image=rect1, pos=(425*new_width, 250*new_height),
                              text_input="yes", font=get_font(75*new_size), base_color="White", hovering_color="Green")
-        NO_BUTTON = Button(image=pygame.image.load("assets/sprites/Warning rect.png").convert(), pos=(775*new_width, 250*new_height),
+        NO_BUTTON = Button(image=rect1, pos=(775*new_width, 250*new_height),
                                  text_input="no", font=get_font(75*new_size), base_color="White", hovering_color="Red")
 
         screen.blit(warning_text, warning_rect)
@@ -262,7 +280,7 @@ def info():
         CREDITS2_TEXT = get_font(60*new_size).render("made in pygame", True, "gold").convert_alpha()
         CREDITS2_RECT = CREDITS2_TEXT.get_rect(center=(600*new_width, 300*new_height))
 
-        RETURN_BUTTON = Button(image=pygame.image.load("assets/sprites/Quit Rect.png").convert(), pos=(600*new_width, 400*new_height),
+        RETURN_BUTTON = Button(image=rect2, pos=(600*new_width, 400*new_height),
                             text_input="return", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
 
         screen.blit(INFO_TEXT, INFO_RECT)
@@ -295,7 +313,10 @@ def info():
         pygame.display.update()
 
 def play():
+    screen_value = 255
     pygame.mixer.music.stop()
+    level_music = pygame.mixer.music.load("assets/audio/bass.mid")
+    pygame.mixer.music.play()
     while True:
         for event in pygame.event.get():
             keys = pygame.key.get_pressed()
@@ -305,17 +326,25 @@ def play():
                 pygame.quit()
                 sys.exit()
 
-            #if event.type == pygame.MOUSEBUTTONDOWN:
-                #player.attack(*event.pos)
-
         keys = pygame.key.get_pressed()
 
-        screen.fill((255, 255, 255))
+        if player.is_moving == True and screen_value < 255:
+            # vision
+            screen_value += 5
+        if player.is_moving == False and screen_value > 0:
+            # no vision
+            screen_value -= 5
+        
+        screen.fill((0,0,0))
 
-        player.move()
+        #map_surface.set_alpha(screen_value)
 
-        player.draw(screen)
-
+        level.draw(screen)
+        #screen.blit(map_surface, (0, 0))
+        
+        level.update(player)
+        player.update(screen, level)
+        
         crosshair_group.draw(screen)
         crosshair_group.update()
 
