@@ -32,9 +32,9 @@ crosshair_group.add(crosshair)
 pygame.mouse.set_visible(False)
 
 # audio
-click = pygame.mixer.Sound("assets/audio/PremiumBeat_0013_cursor_click_11.wav")
+click = pygame.mixer.Sound("assets/audio/cursor_click_11.wav")
 
-hover = pygame.mixer.Sound("assets/audio/PremiumBeat_0013_move_cursor_11.wav")
+hover = pygame.mixer.Sound("assets/audio/move_cursor_11.wav")
 
 menu_music = pygame.mixer.music.load("assets/audio/song55.mid")
 
