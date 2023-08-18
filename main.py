@@ -16,10 +16,7 @@ pygame.mixer.music.set_volume(volume)
 
 # setup
 screen = pygame.display.set_mode((1920, 1080))
-BACKGROUND_MENU = "black"
-BACKGROUND_GAME = "black"
-BACKGROUND_SETTINGS = "black"
-BACKGROUND_WARNING = "black"
+BACKGROUND = "black"
 
 pygame.display.set_caption("Pixel Breaker")
 
@@ -68,7 +65,7 @@ def start_menu():
     level_music = pygame.mixer.music.load("assets/audio/song55.mid")
     pygame.mixer.music.play()
     while True:
-        screen.fill((0,0,0))
+        screen.fill(BACKGROUND)
 
         mouse_pos = pygame.mouse.get_pos()
         start_text = get_font(100*new_size).render("Pixel Breaker", True, "purple").convert_alpha()
@@ -121,12 +118,13 @@ def start_menu():
         crosshair_group.update()
 
         pygame.display.update()
-    
 def howtoplay():
     about = """
-    Pixel Breaker is a stealth game where you play as a hacker who can only see the level when he is standing still. You and your mentor are data thieves who break into high-security buildings and steal valuable information from corporations. However, your latest heist goes wrong when you are betrayed by a fellow data thief who steals your data and leaves you for dead. You manage to escape, but you are now hunted by the corporations and the traitor. You have to use your hacking skills and your mutation to sneak past enemies, hack devices, and find clues to track down the traitor and get your data back. Along the way, you will discover secrets and conspiracies that will change your life forever.
-
-    The game features pixel art graphics, cyberpunk music, and simple controls. The game is divided into levels, each with a different setting, layout, and objective. The game challenges you to use your vision wisely, as you can only see the level when you are still, but you also have to move quickly and quietly to avoid detection. The game also lets you hack various devices, such as cameras, doors, alarms, and robots, to help you progress or distract your enemies. The game has a branching storyline, with multiple endings depending on your choices and actions.
+    Controls
+   +-----+----------+
+   |WASD | Movement |
+   |Esc  |     Menu |
+   +-----+----------+
     """
     while True:
         screen.fill((0,0,0))
@@ -166,7 +164,7 @@ def howtoplay():
 def settings():
     global volume
     while True:
-        screen.fill(BACKGROUND_SETTINGS)
+        screen.fill(BACKGROUND)
 
         mouse_pos = pygame.mouse.get_pos()
 
@@ -229,7 +227,7 @@ def settings():
 
 def warning_quit():
     while True:
-        screen.fill(BACKGROUND_WARNING)
+        screen.fill(BACKGROUND)
 
         mouse_pos = pygame.mouse.get_pos()
 
@@ -267,7 +265,7 @@ def warning_quit():
 
 def info():
     while True:
-        screen.fill(BACKGROUND_SETTINGS)
+        screen.fill(BACKGROUND)
 
         mouse_pos = pygame.mouse.get_pos()
 
