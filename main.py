@@ -15,8 +15,27 @@ time_passed = 0
 pygame.mixer.music.set_volume(volume)
 
 # setup
-screen = pygame.display.set_mode((1920, 1080))
+screen_width, screen_height = 1920, 1080
+screen = pygame.display.set_mode((screen_width, screen_height))
 BACKGROUND = "black"
+BACKGROUND_IMAGE = pygame.image.load("far-buildings.png").convert_alpha()
+
+image_width, image_height = BACKGROUND_IMAGE.get_size()
+
+scale_x = screen_width / image_width
+scale_y = screen_height / image_height
+scale = max(scale_x, scale_y)
+
+# Calculate the new dimensions of the image
+new_image_width = int(image_width * scale)
+new_image_height = int(image_height * scale)
+
+# Resize the background image to cover the screen
+BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (new_image_width, new_image_height))
+
+# Calculate the position to center the image on the screen
+x_offset = (new_image_width - screen_width) // -2
+y_offset = (new_image_height - screen_height) // -2
 
 pygame.display.set_caption("Pixel Breaker")
 
@@ -40,19 +59,18 @@ menu_music = pygame.mixer.music.load("assets/audio/song55.mid")
 rect1 = pygame.image.load("assets/images/Rect1.png").convert()
 rect2 = pygame.image.load("assets/images/Rect2.png").convert()
 rect3 = pygame.image.load("assets/images/Rect3.png").convert()
-gear = pygame.image.load("assets/images/settings_gear.png").convert()
-question = pygame.image.load("assets/images/ques.png").convert()
-info_img = pygame.image.load("assets/images/info.png").convert()
+gear = pygame.image.load("assets/images/settings_gear.png").convert_alpha()
+question = pygame.image.load("assets/images/ques.png").convert_alpha()
+info_img = pygame.image.load("assets/images/info.png").convert_alpha()
 on = pygame.image.load("assets/images/audio_on.png").convert()
 off = pygame.image.load("assets/images/audio_off.png").convert()
 
 def get_font(size):
     return pygame.font.Font("assets/font.ttf", int(size))
 
-width, height = 1920, 1080
 
 level = Level()
-player = Player(width/2,height/2)
+player = Player(screen_width/2,screen_height/2)
 
 map_surface = pygame.Surface((1920, 1080))
 
@@ -82,6 +100,8 @@ def start_menu():
         INFO_BUTTON = Button(image=info_img, pos=(1140*new_width, 175*new_height),
                              text_input="", font=get_font(75*new_size), base_color="White", hovering_color="Red")
 
+        screen.blit(BACKGROUND_IMAGE, (0, 0))
+        
         screen.blit(start_text, start_rect)
 
         for button in [PLAY_BUTTON, SETTINGS_BUTTON, QUIT_BUTTON, HOWTOPLAY_BUTTON, INFO_BUTTON]:

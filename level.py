@@ -1,4 +1,4 @@
-import pytmx, pygame
+import pytmx
 from lerp import lerp
 
 class Level:
