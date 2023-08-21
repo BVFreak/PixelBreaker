@@ -1,8 +1,9 @@
-import pygame, sys, random
-from player import Player
-from button import Button
-from crosshair import Crosshair
-from level import Level
+import pygame, sys
+from assets.scripts.player import Player
+from assets.scripts.button import Button
+from assets.scripts.crosshair import Crosshair
+from assets.scripts.level import Level
+from assets.scripts.composer import PulsatingScreen
 
 pygame.mixer.pre_init(44100,-16,2, 1024)
 pygame.init()
@@ -18,7 +19,7 @@ pygame.mixer.music.set_volume(volume)
 screen_width, screen_height = 1920, 1080
 screen = pygame.display.set_mode((screen_width, screen_height))
 BACKGROUND = "black"
-BACKGROUND_IMAGE = pygame.image.load("far-buildings.png").convert_alpha()
+BACKGROUND_IMAGE = pygame.image.load("assets/images/far-buildings.png").convert_alpha()
 
 image_width, image_height = BACKGROUND_IMAGE.get_size()
 
@@ -65,14 +66,22 @@ info_img = pygame.image.load("assets/images/info.png").convert_alpha()
 on = pygame.image.load("assets/images/audio_on.png").convert()
 off = pygame.image.load("assets/images/audio_off.png").convert()
 
-def get_font(size):
-    return pygame.font.Font("assets/font.ttf", int(size))
+def get_font(size: int):
+    """Gets font.
+
+    Args:
+        size (int): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    return pygame.font.Font("assets/fonts/font.ttf", int(size))
 
 
 level = Level()
 player = Player(screen_width/2,screen_height/2)
 
-map_surface = pygame.Surface((1920, 1080))
+map_surface = pygame.Surface((1920, 1080)).convert_alpha()
 
 new_width = 1.6
 new_height = 1.53125
@@ -86,13 +95,13 @@ def start_menu():
         screen.fill(BACKGROUND)
 
         mouse_pos = pygame.mouse.get_pos()
-        start_text = get_font(100*new_size).render("Pixel Breaker", True, "purple").convert_alpha()
+        start_text = get_font(100*new_size).render("Pixel Breaker", True, "orange").convert_alpha()
         start_rect = start_text.get_rect(center=(600*new_width, 100*new_height))
 
         PLAY_BUTTON = Button(image=rect1, pos=(600*new_width, 300*new_height),
-                             text_input="play", font=get_font(75*new_size), base_color="White", hovering_color="Green")
+                             text_input="Play", font=get_font(75*new_size), base_color="White", hovering_color="Green")
         QUIT_BUTTON = Button(image=rect1, pos=(600*new_width, 500*new_height),
-                             text_input="quit", font=get_font(75*new_size), base_color="White", hovering_color="Red")
+                             text_input="Quit", font=get_font(75*new_size), base_color="White", hovering_color="Red")
         SETTINGS_BUTTON = Button(image=gear, pos=(1140*new_width, 60*new_height),
                                  text_input="", font=get_font(30*new_size), base_color="White", hovering_color="Black")
         HOWTOPLAY_BUTTON = Button(image=question, pos=(1135*new_width, 310*new_height),
@@ -141,10 +150,8 @@ def start_menu():
 def howtoplay():
     about = """
     Controls
-   +-----+----------+
-   |WASD | Movement |
-   |Esc  |     Menu |
-   +-----+----------+
+    WASD | Movement
+    Esc  | Menu/Quit
     """
     while True:
         screen.fill((0,0,0))
@@ -154,11 +161,11 @@ def howtoplay():
         howtoplay_text = get_font(100*new_size).render("ABOUT", True, "white").convert_alpha()
         howtoplay_rect = howtoplay_text.get_rect(center=(600*new_width, 100*new_height))
 
-        howtoplay2_text = get_font(10*new_size).render(about, True, "white").convert_alpha()
+        howtoplay2_text = get_font(25*new_size).render(about, True, "white").convert_alpha()
         howtoplay2_rect = howtoplay2_text.get_rect(center=(600*new_width, 300*new_height))
 
-        RETURN_BUTTON = Button(image=rect1, pos=(600*new_width, 500*new_height),
-                        text_input="return", font=get_font(50*new_size), base_color="white", hovering_color="Darkgray")
+        RETURN_BUTTON = Button(image=rect2, pos=(600*new_width, 500*new_height),
+                        text_input="Return", font=get_font(75*new_size), base_color="white", hovering_color="Darkgray")
 
         screen.blit(howtoplay_text,howtoplay_rect)
         screen.blit(howtoplay2_text,howtoplay2_rect)
@@ -190,9 +197,12 @@ def settings():
 
         SETTINGS_TEXT = get_font(100*new_size).render("SETTINGS", True, "gray").convert_alpha()
         SETTINGS_RECT = SETTINGS_TEXT.get_rect(center=(600*new_width, 100*new_height))
+        
+        VOLUME_TEXT = get_font(20*new_size).render(f"Volume [ {volume}% ]", True, "white").convert_alpha()
+        VOLUME_RECT = VOLUME_TEXT.get_rect(center=(600*new_width, 600*new_height))
 
-        RETURN_BUTTON = Button(image=rect2, pos=(600*new_width, 400*new_height),
-                            text_input="return", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
+        RETURN_BUTTON = Button(image=rect2, pos=(600*new_width, 500*new_height),
+                            text_input="Return", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
 
         AUDIO_ON_BUTTON = Button(image=on, pos=(500*new_width, 250*new_height),
                             text_input="", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
@@ -200,6 +210,8 @@ def settings():
                             text_input="", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
         
         screen.blit(SETTINGS_TEXT, SETTINGS_RECT)
+        screen.blit(VOLUME_TEXT, VOLUME_RECT)
+        
         for button in [AUDIO_ON_BUTTON]:
             button.changeColor(mouse_pos)
             button.update(screen)
@@ -255,9 +267,9 @@ def warning_quit():
         warning_rect = warning_text.get_rect(center=(600*new_width, 100*new_height))
 
         YES_BUTTON = Button(image=rect1, pos=(425*new_width, 250*new_height),
-                             text_input="yes", font=get_font(75*new_size), base_color="White", hovering_color="Green")
+                             text_input="Yes", font=get_font(75*new_size), base_color="White", hovering_color="Green")
         NO_BUTTON = Button(image=rect1, pos=(775*new_width, 250*new_height),
-                                 text_input="no", font=get_font(75*new_size), base_color="White", hovering_color="Red")
+                                 text_input="No", font=get_font(75*new_size), base_color="White", hovering_color="Red")
 
         screen.blit(warning_text, warning_rect)
 
@@ -289,14 +301,14 @@ def info():
 
         mouse_pos = pygame.mouse.get_pos()
 
-        INFO_TEXT = get_font(100*new_size).render("INFO", True, "blue").convert_alpha()
+        INFO_TEXT = get_font(100*new_size).render("INFO & CREDITS", True, "blue").convert_alpha()
         INFO_RECT = INFO_TEXT.get_rect(center=(600*new_width, 100*new_height))
 
-        CREDITS1_TEXT = get_font(50*new_size).render("this was made by blake verner copyright lololol", True, "silver").convert_alpha()
+        CREDITS1_TEXT = get_font(50*new_size).render("Blake Verner - Developer", True, "silver").convert_alpha()
         CREDITS1_RECT = CREDITS1_TEXT.get_rect(center=(600*new_width, 200*new_height))
 
-        CREDITS2_TEXT = get_font(60*new_size).render("made in pygame", True, "gold").convert_alpha()
-        CREDITS2_RECT = CREDITS2_TEXT.get_rect(center=(600*new_width, 300*new_height))
+        CREDITS2_TEXT = get_font(45*new_size).render("cTrix - Music", True, "silver").convert_alpha()
+        CREDITS2_RECT = CREDITS2_TEXT.get_rect(center=(600*new_width, 275*new_height))
 
         RETURN_BUTTON = Button(image=rect2, pos=(600*new_width, 400*new_height),
                             text_input="return", font=get_font(75*new_size), base_color="White", hovering_color="DarkGray")
@@ -335,6 +347,13 @@ def play():
     pygame.mixer.music.stop()
     level_music = pygame.mixer.music.load("assets/audio/bass.mid")
     pygame.mixer.music.play()
+
+    pulse_duration = 632  # Time duration of each pulse in milliseconds
+    base_brightness = 100  # Initial brightness of the screen
+    brightness_range = 50  # Range of brightness variation
+    pulsating_screen = PulsatingScreen(pulse_duration, base_brightness, brightness_range)
+
+
     while True:
         for event in pygame.event.get():
             keys = pygame.key.get_pressed()
@@ -353,19 +372,23 @@ def play():
             # no vision
             screen_value -= 5
         
-        screen.fill((0,0,0))
+        screen.fill((0, 0, 0))
 
-        #map_surface.set_alpha(screen_value)
+        map_surface.set_alpha(screen_value)
 
         level.draw(screen)
-        #screen.blit(map_surface, (0, 0))
-        
+
+        pulsating_screen.draw(screen)
+
+        screen.blit(map_surface, (0, 0))
+
         level.update(player)
         player.update(screen, level)
-        
+
         crosshair_group.draw(screen)
         crosshair_group.update()
 
         pygame.display.update()
+
 
 start_menu()
