@@ -4,7 +4,7 @@ from assets.scripts.button import Button
 from assets.scripts.crosshair import Crosshair
 from assets.scripts.level import Level
 from assets.scripts.font import get_font
-from assets.scripts import debug
+from assets.scripts import debugging
 
 pygame.mixer.pre_init(44100,-16,2, 1024)
 pygame.init()
@@ -134,6 +134,65 @@ def start_menu():
         crosshair_group.update()
 
         pygame.display.update()
+        
+def menu():
+    while True:
+        screen.fill(BACKGROUND)
+
+        mouse_pos = pygame.mouse.get_pos()
+        start_text = get_font(200).render("Pixel Breaker", True, "orange").convert_alpha()
+        start_rect = start_text.get_rect(center=(960, 150))
+
+        PLAY_BUTTON = Button(image=rect1, pos=(960, 450),
+                             text_input="Play", font=get_font(150), base_color="White", hovering_color="Green")
+        QUIT_BUTTON = Button(image=rect1, pos=(960, 750),
+                             text_input="Quit", font=get_font(150), base_color="White", hovering_color="Red")
+        SETTINGS_BUTTON = Button(image=gear, pos=(1825, 90),
+                                 text_input="", font=get_font(60), base_color="White", hovering_color="Black")
+        HOWTOPLAY_BUTTON = Button(image=question, pos=(1815, 465),
+                             text_input="", font=get_font(150), base_color="White", hovering_color="Red")
+        INFO_BUTTON = Button(image=info_img, pos=(1825, 260),
+                             text_input="", font=get_font(150), base_color="White", hovering_color="Red")
+
+        screen.blit(BACKGROUND_IMAGE, (0, 0))
+        
+        screen.blit(start_text, start_rect)
+
+        for button in [PLAY_BUTTON, SETTINGS_BUTTON, QUIT_BUTTON, HOWTOPLAY_BUTTON, INFO_BUTTON]:
+            #pygame.mixer.Sound.play(hover)
+            button.changeColor(mouse_pos)
+            button.update(screen)
+
+
+        for event in pygame.event.get():
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_ESCAPE]:
+                warning_quit()
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if PLAY_BUTTON.checkForInput(mouse_pos):
+                    pygame.mixer.Sound.play(button_click)
+                    play()
+                if SETTINGS_BUTTON.checkForInput(mouse_pos):
+                    pygame.mixer.Sound.play(button_click)
+                    settings()
+                if QUIT_BUTTON.checkForInput(mouse_pos):
+                    pygame.mixer.Sound.play(button_click)
+                    warning_quit()
+                if HOWTOPLAY_BUTTON.checkForInput(mouse_pos):
+                    pygame.mixer.Sound.play(button_click)
+                    howtoplay()
+                if INFO_BUTTON.checkForInput(mouse_pos):
+                    pygame.mixer.Sound.play(button_click)
+                    info()
+
+        crosshair_group.draw(screen)
+        crosshair_group.update()
+
+        pygame.display.update()
+
 def howtoplay():
     about = """
     Controls
@@ -365,10 +424,7 @@ def play():
         player.update(screen, level)
 
         ### ! Use only for debugging !
-        debug = screen_value # <- Add your debugging variable here
-        DEBUG_TEXT = get_font(50).render(f"{debug}", True, "white").convert_alpha()
-        DEBUG_RECT = DEBUG_TEXT.get_rect(center=(100, 100))
-        screen.blit(DEBUG_TEXT, DEBUG_RECT)
+        #debugging.debug(screen, screen_value)
         ###
 
 
