@@ -5,6 +5,7 @@ from assets.scripts.crosshair import Crosshair
 from assets.scripts.level import Level
 from assets.scripts.font import get_font
 from assets.scripts import debugging
+from assets.scripts.enemies import Enemy
 
 pygame.mixer.pre_init(44100,-16,2, 1024)
 pygame.init()
@@ -71,6 +72,8 @@ off = pygame.image.load("assets/images/audio_off.png").convert()
 
 level = Level()
 player = Player(screen_width/2,screen_height/2)
+
+enemy = Enemy(960, 150)
 
 map_surface = pygame.Surface((1920, 1080)).convert_alpha()
 
@@ -405,6 +408,7 @@ def play():
 
         level.update(player)
         player.update(screen, level)
+        enemy.update(screen, level)
 
 
         #debugging.debug(screen, screen_value)
