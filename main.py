@@ -381,16 +381,13 @@ def play():
 
     while True:
         for event in pygame.event.get():
-            keys = pygame.key.get_pressed()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     mini_menu()
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
-        keys = pygame.key.get_pressed()
-
+                
         if player.is_moving == True and screen_value < 255:
             # vision
             screen_value += 1
