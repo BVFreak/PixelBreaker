@@ -135,30 +135,20 @@ def start_menu():
 
         pygame.display.update()
         
-def menu():
+def mini_menu():
     while True:
         screen.fill(BACKGROUND)
-
-        mouse_pos = pygame.mouse.get_pos()
-        start_text = get_font(200).render("Pixel Breaker", True, "orange").convert_alpha()
-        start_rect = start_text.get_rect(center=(960, 150))
-
-        PLAY_BUTTON = Button(image=rect1, pos=(960, 450),
-                             text_input="Play", font=get_font(150), base_color="White", hovering_color="Green")
-        QUIT_BUTTON = Button(image=rect1, pos=(960, 750),
-                             text_input="Quit", font=get_font(150), base_color="White", hovering_color="Red")
-        SETTINGS_BUTTON = Button(image=gear, pos=(1825, 90),
-                                 text_input="", font=get_font(60), base_color="White", hovering_color="Black")
-        HOWTOPLAY_BUTTON = Button(image=question, pos=(1815, 465),
-                             text_input="", font=get_font(150), base_color="White", hovering_color="Red")
-        INFO_BUTTON = Button(image=info_img, pos=(1825, 260),
-                             text_input="", font=get_font(150), base_color="White", hovering_color="Red")
-
-        screen.blit(BACKGROUND_IMAGE, (0, 0))
         
-        screen.blit(start_text, start_rect)
+        mouse_pos = pygame.mouse.get_pos()
 
-        for button in [PLAY_BUTTON, SETTINGS_BUTTON, QUIT_BUTTON, HOWTOPLAY_BUTTON, INFO_BUTTON]:
+        RESUME_BUTTON = Button(image=rect2, pos=(960, 425),
+                             text_input="Resume", font=get_font(125), base_color="White", hovering_color="Green")
+        SETTINGS_BUTTON = Button(image=rect2, pos=(960, 600),
+                             text_input="Settings", font=get_font(125), base_color="White", hovering_color="Black")
+        EXIT_BUTTON = Button(image=rect2, pos=(960, 775),
+                             text_input="Exit", font=get_font(125), base_color="White", hovering_color="Red")
+
+        for button in [RESUME_BUTTON, SETTINGS_BUTTON, EXIT_BUTTON]:
             #pygame.mixer.Sound.play(hover)
             button.changeColor(mouse_pos)
             button.update(screen)
@@ -166,27 +156,22 @@ def menu():
 
         for event in pygame.event.get():
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_ESCAPE]:
-                warning_quit()
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                 if event.key == pygame.K_ESCAPE:
+                    play()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if PLAY_BUTTON.checkForInput(mouse_pos):
+                if RESUME_BUTTON.checkForInput(mouse_pos):
                     pygame.mixer.Sound.play(button_click)
                     play()
                 if SETTINGS_BUTTON.checkForInput(mouse_pos):
                     pygame.mixer.Sound.play(button_click)
                     settings()
-                if QUIT_BUTTON.checkForInput(mouse_pos):
+                if EXIT_BUTTON.checkForInput(mouse_pos):
                     pygame.mixer.Sound.play(button_click)
-                    warning_quit()
-                if HOWTOPLAY_BUTTON.checkForInput(mouse_pos):
-                    pygame.mixer.Sound.play(button_click)
-                    howtoplay()
-                if INFO_BUTTON.checkForInput(mouse_pos):
-                    pygame.mixer.Sound.play(button_click)
-                    info()
+                    start_menu()
 
         crosshair_group.draw(screen)
         crosshair_group.update()
@@ -397,8 +382,9 @@ def play():
     while True:
         for event in pygame.event.get():
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_ESCAPE]:
-                start_menu()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    mini_menu()
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
