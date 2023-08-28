@@ -407,10 +407,10 @@ def play():
 
         if player.is_moving == True and screen_value < 255:
             # vision
-            screen_value += 5
+            screen_value += 1
         if player.is_moving == False and screen_value > 0:
             # no vision
-            screen_value -= 10
+            screen_value -= 2
         
         screen.fill((0, 0, 0))
 
@@ -423,10 +423,8 @@ def play():
         level.update(player)
         player.update(screen, level)
 
-        ### ! Use only for debugging !
-        #debugging.debug(screen, screen_value)
-        ###
 
+        #debugging.debug(screen, screen_value)
 
         crosshair_group.draw(screen)
         crosshair_group.update()
